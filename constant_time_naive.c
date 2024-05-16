@@ -1,19 +1,9 @@
-
 # include <stdlib.h>
 # include <stdbool.h>
 # include <stdio.h>
+# include <stdint.h>
 
-uint32_t select_u32 (bool b, uint32_t x, uint32_t y) {
-    return b ? x : y;
-}
-
-int main(void) {
-    bool b = 1;
-    int x = 1;
-    int y = 2;
-
-    int v = select_u32(b, x, y);
-    printf("Value chosen was: %d\n", v);
-
-    return EXIT_SUCCESS;
+uint32_t ct_select_u32(uint32_t x, uint32_t y) {
+    uint32_t m = -(uint32_t) ((x | -x) >> 31);
+    return (x & m) | (y & ~m);
 }
