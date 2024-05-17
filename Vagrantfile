@@ -47,7 +47,13 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :shell, name: "Install dependencies", inline: $script
 
-  config.vm.provision "shell", inline: $shell
+  config.vm.provision "shell", name: "Install lmrs2", inline: $shell
 
   config.vm.post_up_message = $msg
+
+  config.vm.provider "virtualbox" do |v|
+        v.name = "What you get is what you C"
+        v.memory = 4096
+        v.cpus = 2
+  end
 end
