@@ -11,12 +11,15 @@ apt-get -qq install -y \
         cmake \
         g++ \
         binutils-dev \
-        clang-3.3 \
         libc6-dev-i386
 
 SCRIPT
 
 $shell = <<-'SHELL'
+# Prerequisites
+export BASE_DIR=/home/vagrant
+cd $BASE_DIR
+
 # Clone and build LLVM for zerostack
 git clone https://github.com/lmrs2/llvm.git -b zerostack_38 --single-branch --depth 1
 cd llvm/tools
@@ -28,6 +31,28 @@ cmake --build .
 sudo make install
 export LLVM_SRC=`llvm-config --src-root`
 export LLVM_BUILD=$LLVM_SRC/build
+
+# Clone and build compiler-rt
+cd $LLVM_SRC/projects
+git clone https://github.com/llvm-mirror/compiler-rt.git -b release_38 --single-branch --depth 1
+mkdir build && cd build
+cmake -DCMAKE_C_COMPILER="clang" -DCMAKE_C_FLAGS="-fPIC" -DCOMPILER_RT_BUILD_SANITIZERS=OFF ../compiler-rt
+make
+sudo make install
+export BUILTIN_BUILD=$LLVM_SRC/projects/build
+
+# Clone and build musl-libc
+cd $LLVM_BUILD
+vi ../lib/Target/X86/X86ZeroStackPass.cpp
+cmake --build . --target LLVMX86CodeGen && sudo make install
+cd $BASE_DIR
+export MUSL_BUILD=$BASE_DIR/musl-1.1.14
+git clone https://github.com/lmrs2/musl-1.1.14.git
+cd $MUSL_BUILD
+LIBCC=/usr/local/lib/linux/libclang_rt.builtins-x86_64.a CFLAGS="-D_ZEROSTACK_=1 -fno-optimize-sibling-calls"  CC=clang ./configure --disable-static
+make
+sudo make install
+PATH=$PATH:/usr/local/musl/bin
 
 SHELL
 
