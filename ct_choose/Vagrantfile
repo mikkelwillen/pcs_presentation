@@ -17,7 +17,7 @@ apt-get -qq install -y \
 SCRIPT
 
 $shell = <<-'SHELL'
-# Clone and build LLVM
+# Clone and build LLVM for ct_choose
 git clone https://github.com/lmrs2/llvm.git -b ctchoose_38 --single-branch --depth 1
 cd llvm/tools
 git clone https://github.com/lmrs2/clang.git -b ctchoose_38 --single-branch --depth 1
@@ -47,12 +47,12 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :shell, name: "Install dependencies", inline: $script
 
-  config.vm.provision "shell", name: "Install lmrs2", inline: $shell
+  config.vm.provision "shell", name: "Install lmrs2 ctchoose_38", inline: $shell
 
   config.vm.post_up_message = $msg
 
   config.vm.provider "virtualbox" do |v|
-        v.name = "What you get is what you C"
+        v.name = "What you get is what you C - ct_choose"
         v.memory = 4096
         v.cpus = 2
   end

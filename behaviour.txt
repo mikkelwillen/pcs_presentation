@@ -1,6 +1,0 @@
-
---- constant_time_naive
-
-- Clang v1: csel.
-
-- Clang v2: csel.
